@@ -1,15 +1,18 @@
 import { Link } from "react-router-dom"
 import { useGoogleAuth } from "../../context/GoogleAuthProvider";
+import { useLogin } from "../../context/LoginAuthProvider";
 
 
 const Nav = () => {
   
   const {user,googleSignOut} = useGoogleAuth();
-  console.log("In nav",user)
+  const {loginUser,logout} = useLogin()
+  console.log("In nav google:",user)
+  console.log("In nav login : ",loginUser)
   
 
   return (
-    <div className="navbar bg-fountain-blue-800 text-fountain-blue-50 sticky top-0 bg-opacity-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 glass">
+    <div className="navbar z-50 bg-fountain-blue-800 text-fountain-blue-50 sticky top-0 bg-opacity-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 glass">
       <div className="container mx-auto">
 
   <div className="navbar-start">
@@ -41,12 +44,12 @@ const Nav = () => {
   <div className="navbar-end hidden lg:flex">
     <ul className="menu menu-horizontal px-1">
       {
-        user ?
+        user || loginUser ?
         
         <li>
         <Link to="/" className="text-xl"
         onClick={()=>{
-          googleSignOut()
+         user ? googleSignOut():logout()
         }}
         
          

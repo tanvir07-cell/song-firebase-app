@@ -10,17 +10,17 @@ import { toast } from "react-toastify";
 
 
 
-const Signin = () => {
+const SignUp = () => {
 
   const [userInfo, setUserInfo] = useState({
     email: '',
-    password: ''
+    password: '',
+    name:'',
   
   })
 
-
   const {googleSignIn} = useGoogleAuth();
-  const {login,errorState} = useLogin()
+  const {createUser} = useLogin()
 
 
   const handleInputChange = (e)=>{
@@ -43,6 +43,18 @@ const Signin = () => {
     backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200
     ">
       <form className="card-body">
+ 
+      <div className="form-control">
+          <label className="label" htmlFor="name">
+            <span className="label-text text-fountain-blue-50">Name</span>
+          </label>
+          <input type="text" 
+          name = "name"
+          id = "name"
+          onChange={handleInputChange}
+          placeholder="name" className="input input-bordered bg-fountain-blue-900"  />
+        </div>
+
         <div className="form-control">
           <label className="label" htmlFor="email">
             <span className="label-text text-fountain-blue-50">Email</span>
@@ -63,35 +75,46 @@ const Signin = () => {
             id="password"
 
           placeholder="password" className="input input-bordered bg-fountain-blue-900"  />
+         
           <label className="label">
-            <a href="#" className="label-text-alt link link-hover text-fountain-blue-50">Forgot password?</a>
-          </label>
-          <label className="label">
-          <span>Don't have any account?</span> 
-            <Link to = "/register" className="label-text-alt link link-hover text-fountain-blue-200 underline text-xl">Register First</Link>
+          <span>Already have any account?</span> 
+            <Link to = "/signin" className="label-text-alt link link-hover text-fountain-blue-200 underline text-xl">Login Now</Link>
 
           </label>
         </div>
         <div className="form-control mt-6 mb-2">
           <button 
+          disabled = {userInfo.email === '' || userInfo.password === '' || userInfo.name === ''}
+          
            onClick={
               (e)=>{
                 e.preventDefault()
-                login(userInfo.email,userInfo.password)
-                {
-                  errorState && toast.error(errorState)
-                }
-                {
-                  !errorState && toast.success("Login Success")
-                }
-                
+                createUser(userInfo.email,userInfo.password)
+
+                setUserInfo({
+                    email: '',
+                    password: '',
+                    name:'',
+                    
+                })
+                toast.success('User Created Successfully',{
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                })
+
+               
+
               }
 
            }
-          className="btn bg-fountain-blue-500 text-fountain-blue-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 border-none"
-          disabled={userInfo.email === '' || userInfo.password === ''}
-
-          >Login</button>
+          className="btn bg-fountain-blue-500 text-fountain-blue-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 border-none
+           
+          ">Register</button>
         </div>
 
         <div className="form-control">
@@ -109,13 +132,15 @@ const Signin = () => {
             <FaGoogle className="mr-2" /> 
           Sign In With Google</button>
         </div>
+        
       </form>
     </div>
   </div>
 </div>
 
+
 </>
   )
 }
 
-export default Signin
+export default SignUp
