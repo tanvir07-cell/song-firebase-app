@@ -3,14 +3,19 @@ import LOGIN from "../assets/login.svg"
 import { FaGoogle } from "react-icons/fa";
 import { useGoogleAuth } from "../context/GoogleAuthProvider";
 import { useLogin } from "../context/LoginAuthProvider";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { firebaseInit } from "../firebase";
 
+
+const {auth} = firebaseInit()
 
 
 
 const Signin = () => {
+  const navigate = useNavigate()
 
   const [userInfo, setUserInfo] = useState({
     email: '',
@@ -20,7 +25,9 @@ const Signin = () => {
 
 
   const {googleSignIn} = useGoogleAuth();
-  const {login,errorState} = useLogin()
+  const {loginUser,login,handleLogin} = useLogin()
+
+
 
 
   const handleInputChange = (e)=>{
@@ -30,6 +37,46 @@ const Signin = () => {
       [name]:value
     })
   }
+
+
+
+ const handleFormSubmit = (e)=>{
+  e.preventDefault()
+   signInWithEmailAndPassword(auth, userInfo.email, userInfo.password).
+    then((userCredential)=>{
+      const user = userCredential.user
+      console.log("In login : ",user)
+      handleLogin(user)
+      navigate('/')
+      toast.success("Login Successfull")
+    })
+    .catch((error)=>{
+      toast.error(error.message)
+    })
+
+
+  console.log("In login : ",loginUser)
+
+
+  
+  
+  
+}
+
+// when user signup then user will be redirected to login page
+useEffect(()=>{
+  onAuthStateChanged(auth,(user)=>{
+    if(user){
+      console.log("Signin User : ",user)
+      setUserInfo({
+        email:user.email,
+        password:"",
+
+      })
+    }
+
+  })
+},[])
 
   return (
     <>
@@ -51,6 +98,7 @@ const Signin = () => {
           name = "email"
           id = "email"
           onChange={handleInputChange}
+          value={userInfo.email}
           placeholder="email" className="input input-bordered bg-fountain-blue-900"  />
         </div>
         <div className="form-control">
@@ -61,6 +109,7 @@ const Signin = () => {
            onChange={handleInputChange}
            name="password"
             id="password"
+            value={userInfo.password}
 
           placeholder="password" className="input input-bordered bg-fountain-blue-900"  />
           <label className="label">
@@ -75,17 +124,7 @@ const Signin = () => {
         <div className="form-control mt-6 mb-2">
           <button 
            onClick={
-              (e)=>{
-                e.preventDefault()
-                login(userInfo.email,userInfo.password)
-                {
-                  errorState && toast.error(errorState)
-                }
-                {
-                  !errorState && toast.success("Login Success")
-                }
-                
-              }
+              handleFormSubmit
 
            }
           className="btn bg-fountain-blue-500 text-fountain-blue-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 border-none"

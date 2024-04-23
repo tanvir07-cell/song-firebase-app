@@ -3,14 +3,19 @@ import LOGIN from "../assets/login.svg"
 import { FaGoogle } from "react-icons/fa";
 import { useGoogleAuth } from "../context/GoogleAuthProvider";
 import { useLogin } from "../context/LoginAuthProvider";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { firebaseInit } from "../firebase";
+
+const {auth} = firebaseInit()
 
 
 
 
 const SignUp = () => {
+  const navigate = useNavigate()
 
   const [userInfo, setUserInfo] = useState({
     email: '',
@@ -20,7 +25,22 @@ const SignUp = () => {
   })
 
   const {googleSignIn} = useGoogleAuth();
-  const {createUser} = useLogin()
+
+  const handleFormSubmit = (e)=>{
+    e.preventDefault();
+    createUserWithEmailAndPassword(auth,userInfo.email,userInfo.password)
+    .then((userCredential)=>{
+      const user = userCredential.user
+      console.log("Create User : ",user)
+      navigate('/signin')
+      
+      toast.success("User Created Successfully")
+
+    })
+    .catch((error)=>{
+      toast.error(error.message)
+    })
+  }
 
 
   const handleInputChange = (e)=>{
@@ -30,6 +50,8 @@ const SignUp = () => {
       [name]:value
     })
   }
+
+  
 
   return (
     <>
@@ -87,30 +109,7 @@ const SignUp = () => {
           disabled = {userInfo.email === '' || userInfo.password === '' || userInfo.name === ''}
           
            onClick={
-              (e)=>{
-                e.preventDefault()
-                createUser(userInfo.email,userInfo.password)
-
-                setUserInfo({
-                    email: '',
-                    password: '',
-                    name:'',
-                    
-                })
-                toast.success('User Created Successfully',{
-                    position: "top-right",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                })
-
-               
-
-              }
-
+             handleFormSubmit
            }
           className="btn bg-fountain-blue-500 text-fountain-blue-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 border-none
            
