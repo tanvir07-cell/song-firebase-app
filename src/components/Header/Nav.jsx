@@ -1,8 +1,17 @@
 import { Link } from "react-router-dom"
+import { useGoogleAuth } from "../../context/GoogleAuthProvider";
+
 
 const Nav = () => {
+  
+  const {user,googleSignOut} = useGoogleAuth();
+  console.log("In nav",user)
+  
+
   return (
     <div className="navbar bg-fountain-blue-800 text-fountain-blue-50 sticky top-0 bg-opacity-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 glass">
+      <div className="container mx-auto">
+
   <div className="navbar-start">
     <div className="dropdown">
       <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -16,15 +25,49 @@ const Nav = () => {
         </li>
       </ul>
     </div>
-    <Link className="btn btn-ghost text-xl" to="/">TR | SONG</Link>
+    <Link className="btn btn-ghost text-3xl" to="/">TR | S
+    
+    <span className='relative mx-0 text-center'>O  <svg className='inline mb-2 mx-1 absolute top-[-12%] left-[-1%]' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="150" height="50">
+              <circle cx="10" cy="23" r="8" fill="white" stroke="black" strokeWidth="2" />
+              <circle cx="10" cy="23" r="3" fill="black" />
+              
+
+              
+  {/* <text x="20" y="37" font-family="Arial" font-size="1.875rem" line-height="2.25rem" fill="#F1F9FA" >KING</text> */}
+            </svg>
+         </span>
+    NG</Link>
   </div>
   <div className="navbar-end hidden lg:flex">
     <ul className="menu menu-horizontal px-1">
-      <li><Link to="/signin">Login</Link></li>
+      {
+        user ?
+        
+        <li>
+        <Link to="/" className="text-xl"
+        onClick={()=>{
+          googleSignOut()
+        }}
+        
+         
+        >Logout</Link>
+        
+      </li>
+
+        :
+        <li>
+        <Link to="/signin" className="text-xl">Login</Link>
+        
+      </li> 
+    
+      }
       
-      <li><Link>Item 3</Link></li>
+      
+      <li><Link className="text-xl">Item 3</Link></li>
     </ul>
   </div>
+  </div>
+
  
 </div>
   )
