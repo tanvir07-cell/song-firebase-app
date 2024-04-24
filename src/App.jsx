@@ -6,6 +6,7 @@ import LoginAuthProvider from "./context/LoginAuthProvider"
 import SignUp from "./pages/SignUp"
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import AddTune from "./pages/AddTune"
 const App = () => {
   return (
     <div className="text-white">
@@ -18,6 +19,7 @@ const App = () => {
         <Route path = "/" element = {<Home/>} />
         <Route path = "/signin" element = {<Signin/>} />
         <Route path = "/register" element = {<SignUp/>}/>
+        <Route path = "/add-tune" element={<AddTune/>}/>
 
       </Routes>
       </LoginAuthProvider>

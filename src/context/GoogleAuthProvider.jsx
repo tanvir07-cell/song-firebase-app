@@ -4,32 +4,23 @@ const GoogleAuthContext = createContext();
 
 import { firebaseInit } from "../firebase";
 
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import {  signOut } from "firebase/auth";
 
 const {auth} = firebaseInit()
 
 const GoogleAuthProviderContext = ({children}) => {
-    const [user, setUser] = useState(null)
+    const [googleUser, setGoogleUser] = useState(null);
 
-    const googleSignIn = async () => {
-  
-        const provider = new GoogleAuthProvider();
-        try {
-          const result = await signInWithPopup(auth, provider);
-          const user = result.user;
-          console.log(user)
-          setUser(user)
-        } catch (error) {
-          console.log(error)
-        }
-      
-      
-      } 
+    const handleGoogleUser = (user) => {
+        setGoogleUser(user)
+    }
+
+    
 
       const googleSignOut = async () => {
         try {
           await signOut(auth);
-          setUser(null)
+          setGoogleUser(null)
         } catch (error) {
           console.log(error)
         }
@@ -38,9 +29,9 @@ const GoogleAuthProviderContext = ({children}) => {
 
   return (
     <GoogleAuthContext.Provider value={{
-        googleSignIn,
         googleSignOut,
-        user
+        googleUser,
+        handleGoogleUser
     
     }}>
         {children}

@@ -5,9 +5,9 @@ import { useLogin } from "../../context/LoginAuthProvider";
 
 const Nav = () => {
   
-  const {user,googleSignOut} = useGoogleAuth();
+  const {googleUser,googleSignOut} = useGoogleAuth();
   const {loginUser,logout} = useLogin()
-  console.log("In nav google:",user)
+  console.log("In nav google:",googleUser)
   console.log("In nav login : ",loginUser)
   
 
@@ -44,9 +44,9 @@ const Nav = () => {
   <div className="navbar-end hidden lg:flex">
     <ul className="menu menu-horizontal px-1">
       {
-        user || loginUser ?
-        
-        <li>
+        googleUser || loginUser ?
+        <>
+          <li>
         <Link to="/" className="text-xl"
         onClick={()=>{
          user ? googleSignOut():logout()
@@ -56,6 +56,17 @@ const Nav = () => {
         >Logout</Link>
         
       </li>
+
+      <li>
+        <Link to="/add-tune" className="text-xl"
+       
+        
+         
+        >Add Tune</Link>
+        
+      </li>
+        </>
+      
 
         :
         <li>

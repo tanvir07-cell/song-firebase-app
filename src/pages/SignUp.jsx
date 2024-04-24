@@ -2,14 +2,29 @@ import Nav from "../components/Header/Nav"
 import LOGIN from "../assets/login.svg"
 import { FaGoogle } from "react-icons/fa";
 import { useGoogleAuth } from "../context/GoogleAuthProvider";
-import { useLogin } from "../context/LoginAuthProvider";
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {  useEffect, useState } from "react";
+import {Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { createUserWithEmailAndPassword,GithubAuthProvider,GoogleAuthProvider,signInWithPopup } from "firebase/auth";
 import { firebaseInit } from "../firebase";
+import { setDoc,doc, collection, onSnapshot, getDoc } from "firebase/firestore";
 
-const {auth} = firebaseInit()
+const {auth,firestore} = firebaseInit()
+
+const colRef = collection(firestore,"users")
+
+const docRef= doc(colRef)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -24,13 +39,25 @@ const SignUp = () => {
   
   })
 
-  const {googleSignIn} = useGoogleAuth();
+  const {handleGoogleUser,googleUser} = useGoogleAuth();
+
+
+
 
   const handleFormSubmit = (e)=>{
     e.preventDefault();
     createUserWithEmailAndPassword(auth,userInfo.email,userInfo.password)
     .then((userCredential)=>{
       const user = userCredential.user
+
+      setDoc(docRef,{
+        name:userInfo.name,
+        email:userInfo.email,
+        uid:user.uid,
+        isGoogle:false
+      
+      })
+
       console.log("Create User : ",user)
       navigate('/signin')
       
@@ -38,8 +65,48 @@ const SignUp = () => {
 
     })
     .catch((error)=>{
-      toast.error(error.message)
+      if(error.code === "auth/email-already-in-use"){
+        toast.error("Email Already In Use")
+      }
     })
+  }
+
+  const handleGoogleSignIn = (e)=>{
+    e.preventDefault();
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth,provider)
+    .then((userCredential)=>{
+      console.log("User : ",userCredential.user)
+      handleGoogleUser(userCredential.user);
+
+      const existsDocRef = doc(colRef,userCredential.user.uid)
+
+      getDoc(existsDocRef)
+      .then((docSnap)=>{
+        if(docSnap.exists()){
+          console.log("User exists")
+        }
+        else{
+          setDoc(existsDocRef,{
+            name:userCredential.user.displayName,
+            email:userCredential.user.email,
+            uid:userCredential.user.uid,
+            isGoogle:true
+          })
+        }
+      })
+
+
+      
+    
+      navigate('/')
+      toast.success("Google Sign In Successfull")
+    
+    })
+    .catch(err=>{
+      toast.error(err.message)
+    })
+    
   }
 
 
@@ -50,6 +117,18 @@ const SignUp = () => {
       [name]:value
     })
   }
+
+  useEffect(()=>{
+    onSnapshot(colRef,(snapshot)=>{
+      snapshot.forEach((doc)=>{
+        console.log("Data : ",doc.data())
+      })
+
+    })
+
+   
+
+  },[])
 
   
 
@@ -119,13 +198,7 @@ const SignUp = () => {
         <div className="form-control">
           <button className="btn bg-fountain-blue-500 text-fountain-blue-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 border-none"
           
-          onClick={(e)=>{
-            e.preventDefault()
-            googleSignIn()
-
-
-            
-          }}
+          onClick={handleGoogleSignIn}
           
           >
             <FaGoogle className="mr-2" /> 

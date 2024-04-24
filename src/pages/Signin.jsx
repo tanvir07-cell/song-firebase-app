@@ -6,11 +6,24 @@ import { useLogin } from "../context/LoginAuthProvider";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { firebaseInit } from "../firebase";
+import { setDoc,doc, collection, onSnapshot, addDoc, getDoc } from "firebase/firestore";
+
+const {auth,firestore} = firebaseInit()
+
+const colRef = collection(firestore,"users")
+
+const docRef= doc(colRef)
 
 
-const {auth} = firebaseInit()
+
+
+
+
+
+
+
 
 
 
@@ -24,8 +37,9 @@ const Signin = () => {
   })
 
 
-  const {googleSignIn} = useGoogleAuth();
   const {loginUser,login,handleLogin} = useLogin()
+  const {handleGoogleUser,googleUser} = useGoogleAuth();
+
 
 
 
@@ -36,6 +50,48 @@ const Signin = () => {
       ...userInfo,
       [name]:value
     })
+  }
+
+
+  const handleGoogleSignIn = (e)=>{
+    e.preventDefault();
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth,provider)
+    .then((userCredential)=>{
+      console.log("User : ",userCredential.user.uid)
+
+      handleGoogleUser(userCredential.user)
+
+      const existsDocRef = doc(colRef,userCredential.user.uid)
+
+      getDoc(existsDocRef).
+      then((docSnap)=>{
+        if(docSnap.exists()){
+          console.log("User exists")
+        }
+        else{
+          setDoc(existsDocRef,{
+            name:userCredential.user.displayName,
+            email:userCredential.user.email,
+            uid:userCredential.user.uid,
+            isGoogle:true
+          })
+        }
+      
+      })
+
+     
+
+     
+     
+      navigate('/')
+      toast.success("Google Sign In Successfull")
+    
+    })
+    .catch(err=>{
+      toast.error(err.message)
+    })
+    
   }
 
 
@@ -51,7 +107,26 @@ const Signin = () => {
       toast.success("Login Successfull")
     })
     .catch((error)=>{
-      toast.error(error.message)
+
+      if(error.code === "auth/user-not-found"){
+        toast.error("User Not Found")
+      }
+      if(error.code === "auth/wrong-password"){
+        toast.error("Wrong Password")
+      }
+      if(error.code === "auth/invalid-credential"){
+        toast.error("Invalid Credential")
+        
+      }
+
+      
+
+      else{
+        toast.error(error.message)
+      }
+
+
+
     })
 
 
@@ -136,13 +211,9 @@ useEffect(()=>{
         <div className="form-control">
           <button className="btn bg-fountain-blue-500 text-fountain-blue-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 border-none"
           
-          onClick={(e)=>{
-            e.preventDefault()
-            googleSignIn()
-
-
-            
-          }}
+          onClick={
+            handleGoogleSignIn
+          }
           
           >
             <FaGoogle className="mr-2" /> 
