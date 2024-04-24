@@ -50,13 +50,24 @@ const SignUp = () => {
     .then((userCredential)=>{
       const user = userCredential.user
 
-      setDoc(docRef,{
-        name:userInfo.name,
-        email:userInfo.email,
-        uid:user.uid,
-        isGoogle:false
-      
+      const matchIdDocRef = doc(colRef,user.uid);
+
+      getDoc(matchIdDocRef)
+      .then((docSnap)=>{
+        if(docSnap.exists()){
+          console.log("User exists")
+        }
+        else{
+          setDoc(matchIdDocRef,{
+            name:userInfo.name,
+            email:userInfo.email,
+            uid:user.uid,
+            isGoogle:false
+          })
+        }
       })
+
+    
 
       console.log("Create User : ",user)
       navigate('/signin')

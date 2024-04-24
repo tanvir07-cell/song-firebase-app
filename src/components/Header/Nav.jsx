@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom"
 import { useGoogleAuth } from "../../context/GoogleAuthProvider";
 import { useLogin } from "../../context/LoginAuthProvider";
+import { FaHeadphones } from "react-icons/fa";
+
 
 
 const Nav = () => {
@@ -28,11 +30,12 @@ const Nav = () => {
         </li>
       </ul>
     </div>
-    <Link className="btn btn-ghost text-3xl" to="/">TR | S
+    <Link className="btn btn-ghost text-3xl" to="/"><FaHeadphones className="text-fountain-blue-800"/>
+ | S
     
     <span className='relative mx-0 text-center'>O  <svg className='inline mb-2 mx-1 absolute top-[-12%] left-[-1%]' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="150" height="50">
-              <circle cx="10" cy="23" r="8" fill="white" stroke="black" strokeWidth="2" />
-              <circle cx="10" cy="23" r="3" fill="black" />
+              <circle cx="10" cy="22" r="8" fill="white" stroke="black" strokeWidth="2" />
+              <circle cx="10" cy="22" r="3" fill="black" />
               
 
               
