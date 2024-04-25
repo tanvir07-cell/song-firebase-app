@@ -22,12 +22,39 @@ const Nav = () => {
       <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
       </div>
-      <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-        <li>
-          <Link>Login</Link>
-          <Link>Item 2</Link>
+      <ul tabIndex={0} className="bg-fountain-blue-600 menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow rounded-box w-52 text-fountain-blue-50">
+      {
+        googleUser || loginUser ?
+        <>
+          <li>
+        <Link to="/" className="text-xl"
+        onClick={()=>{
+          googleUser ? googleSignOut():logout()
+        }}
+        
          
-        </li>
+        >Logout</Link>
+        
+      </li>
+
+      <li>
+        <Link to="/add-tune" className="text-xl"
+       
+        
+         
+        >Add Tune</Link>
+        
+      </li>
+        </>
+      
+
+        :
+        <li>
+        <Link to="/signin" className="text-xl">Login</Link>
+        
+      </li> 
+    
+      }
       </ul>
     </div>
     <Link className="btn btn-ghost text-3xl" to="/"><FaHeadphones className="text-fountain-blue-800"/>
@@ -52,7 +79,7 @@ const Nav = () => {
           <li>
         <Link to="/" className="text-xl"
         onClick={()=>{
-         user ? googleSignOut():logout()
+         googleUser ? googleSignOut():logout()
         }}
         
          
@@ -80,7 +107,6 @@ const Nav = () => {
       }
       
       
-      <li><Link className="text-xl">Item 3</Link></li>
     </ul>
   </div>
   </div>

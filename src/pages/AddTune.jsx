@@ -11,6 +11,22 @@ const {auth,firestore} = firebaseInit()
 const userColref = collection(firestore,"users");
 
 
+function getYouTubeVideoId(url) {
+  // Regular expression to match YouTube video ID
+  const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})$/;
+  
+  // Extract video ID using the regular expression
+  const match = url.match(regExp);
+
+  if (match && match[1]) {
+    return match[1];
+  } else {
+    // If URL is invalid or doesn't contain a video ID
+    return null;
+  }
+}
+
+
 
 
 
@@ -37,7 +53,9 @@ const AddTune = () => {
 
   const [tune, setTune] = useState({
     artist: '',
-    song: ''
+    song: '',
+    videoUrl:'',
+    videoId:''
   })
   const handleInputChange = (e)=>{
     const {name,value} = e.target;
@@ -49,7 +67,7 @@ const AddTune = () => {
 
   const handleTuneSubmit = (e) => {
     e.preventDefault();
-    const { artist, song } = tune;
+    const { artist, song,videoUrl } = tune;
     let specificDocRef;
 
     // Check if user is logged in with Google
@@ -61,6 +79,8 @@ const AddTune = () => {
       specificDocRef = doc(userColref, loginUser.uid);
     }
 
+
+
     if (specificDocRef) {
       getDoc(specificDocRef)
         .then((docSnap) => {
@@ -71,7 +91,9 @@ const AddTune = () => {
                 ...(docSnap.data().tunes || []),
                 {
                   artist,
-                  song
+                  song,
+                  videoUrl,
+                  videoId:getYouTubeVideoId(videoUrl)
                 }
               ]
             }, { merge: true });
@@ -80,7 +102,10 @@ const AddTune = () => {
               tunes: [
                 {
                   artist,
-                  song
+                  song,
+                  videoUrl,
+                  videoId:getYouTubeVideoId(videoUrl)
+
                 }
               ]
             });
@@ -124,6 +149,21 @@ const AddTune = () => {
           
 
         </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text text-fountain-blue-50">Video Url</span>
+          </label>
+          <input type="text" 
+                     onChange={handleInputChange}
+                     id="videoUrl"
+                      name="videoUrl"
+
+          placeholder="Video Url" className="input input-bordered bg-fountain-blue-900 text-fountain-blue-50" required />
+          
+
+        </div>
+
         <div className="form-control mt-6">
           <button className="btn bg-fountain-blue-500 text-fountain-blue-50 backdrop-blur-lg backdrop-filter shadow-sm shadow-fountain-blue-200 border-none"
 >          <FaHeadphones className="mr-2"/>
